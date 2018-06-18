@@ -49,7 +49,7 @@ function getGifs(index){
         method: "GET",
     }).then(function(response){
         var gif = response.data;
-
+        console.log(response);
         for (var i = 0; i<gif.length; i++){
             var imageStill = gif[i].images.fixed_height_still.url;
             var imageAnimate = gif[i].images.fixed_height.url;
@@ -67,6 +67,14 @@ function getGifs(index){
             newImg.addClass("gif");
             newImg.attr("id", "gif-" + (offsetAPI+i));
             newDiv.append(newImg);
+            if(isGifInfo){
+                var imgTitle = $("<p>");
+                var imgSrc = $("<p>");
+                imgTitle.html("<h5>Title: " + gif[i].title + "</h5>");
+                imgSrc.html("<h5>Originally Found at: " + gif[i].source_tld + "</h5>");
+                newDiv.append(imgTitle);
+                newDiv.append(imgSrc);
+            }
             newDiv.append(newTag);
             $(".imgArray").prepend(newDiv);   
         }
@@ -107,8 +115,16 @@ $(document).ready(function(){
             $(".imgArray").empty();
         }
         // Toggle Displaying extra Gif Info
-        else if(event.target.type === "input"){
-            
+        if(event.target.id === "infoToggle"){
+            if(isGifInfo) {
+                isGifInfo = false;
+                console.log(isGifInfo);
+
+            }
+            else if(!isGifInfo) {
+                isGifInfo = true;
+                console.log(isGifInfo);
+            }
         }
     });
     $(document).on("click", ".char", function(){
