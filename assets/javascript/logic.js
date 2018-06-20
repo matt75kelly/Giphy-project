@@ -3,7 +3,7 @@ var keyAPI = "api_key=41KGysPWerlj4WWkV9j4sQhwH5Q8OWmZ";
 var urlAPI = "https://api.giphy.com/v1/gifs/search?";
 var limitAPI = "limit=10";
 var offsetAPI = 0;
-var isGifInfo = "false";
+var isGifInfo = false;
 var btnIndex = 0;
 var userData = {
     newQuery: "",
@@ -54,28 +54,44 @@ function getGifs(index){
             var imageStill = gif[i].images.fixed_height_still.url;
             var imageAnimate = gif[i].images.fixed_height.url;
             var imgRating = gif[i].rating;
+            var imgTitle = gif[i].title;
+            var imgSrc = gif[i].source_tld;
+            var imgTrend = gif[i].trending_datetime;
+            var offset = offsetAPI + i;
 
             var newDiv = $("<div>");
             newDiv.addClass("gifDiv");
             newDiv.attr("style", "float: left; margin: 2vh 1vw 1vh 1vw");
+            newDiv.attr("id", "gifDiv-" + offset);
             var newTag = $("<p>");
             newTag.html("<h5>Rating: " + imgRating + "</h5>");
             var newImg = $("<img>");
             newImg.attr("data-still", imageStill);
             newImg.attr("data-animate", imageAnimate);
             newImg.attr("src", imageStill);
+            newImg.attr("data-title", imgTitle);
+            newImg.attr("data-source", imgSrc);
+            newImg.attr("data-trending", imgTrend);
             newImg.addClass("gif");
-            newImg.attr("id", "gif-" + (offsetAPI+i));
+            newImg.attr("id", "gif-" + offset);
             newDiv.append(newImg);
-            if(isGifInfo){
-                var imgTitle = $("<p>");
-                var imgSrc = $("<p>");
-                imgTitle.html("<h5>Title: " + gif[i].title + "</h5>");
-                imgSrc.html("<h5>Originally Found at: " + gif[i].source_tld + "</h5>");
-                newDiv.append(imgTitle);
-                newDiv.append(imgSrc);
-            }
             newDiv.append(newTag);
+            if(isGifInfo){
+                var gifTitle = $("<p>");
+                var gifSrc = $("<p>");
+                var gifTrending = $("<p>");
+        
+                gifTitle.html("<h5>Title: " + imgTitle + "</h5>");
+                gifTitle.addClass("info");
+                gifSrc.html("<h5>Originally Found at: " + imgSrc + "</h5>");
+                gifSrc.addClass("info");
+                gifTrending.html("<h5>Last Time Trending: " + imgTrend + "</h5>");
+                gifTrending.addClass("info");
+        
+                newDiv.append(gifTitle);
+                newDiv.append(gifSrc);
+                newDiv.append(gifTrending);   
+            }
             $(".imgArray").prepend(newDiv);   
         }
         var newBtn = $("<button>");
@@ -83,6 +99,32 @@ function getGifs(index){
         newBtn.addClass("more btn-outline-secondary");
         $(".form-inline").append(newBtn);
     });
+}
+function displayData(){
+
+    for(var i =0; i < (offsetAPI + 10); i++){
+        var imgTitle = $("<p>");
+        var imgSrc = $("<p>");
+        var imgTrending = $("<p>");
+        var gif = $("#gif-"+i);
+        var gifTitle = gif.attr("data-title");
+        var gifSrc = gif.attr("data-source");
+        var gifTrending = gif.attr("data-trending");
+        var targetDiv = $("#gifDiv-" + i);
+
+        imgTitle.html("<h5>Title: " + gifTitle + "</h5>");
+        imgTitle.addClass("info");
+        imgSrc.html("<h5>Originally Found at: " + gifSrc + "</h5>");
+        imgSrc.addClass("info");
+        imgTrending.html("<h5>Last Time Trending: " + gifTrending + "</h5>");
+        imgTrending.addClass("info");
+        targetDiv.append(imgTitle);
+        targetDiv.append(imgSrc);
+        targetDiv.append(imgTrending);   
+    }
+}
+function removeData(){
+    $(".info").remove();
 }
 // Main Program Starts Here
 for(var i=0; i<userData.keywords.length; i++){
@@ -116,14 +158,15 @@ $(document).ready(function(){
         }
         // Toggle Displaying extra Gif Info
         if(event.target.id === "infoToggle"){
-            if(isGifInfo) {
-                isGifInfo = false;
-                console.log(isGifInfo);
-
-            }
-            else if(!isGifInfo) {
+            if(!isGifInfo){
                 isGifInfo = true;
                 console.log(isGifInfo);
+                displayData();
+            }
+            else if(isGifInfo){
+                isGifInfo = false;
+                console.log(isGifInfo);
+                removeData();
             }
         }
     });
